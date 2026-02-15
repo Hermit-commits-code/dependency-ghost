@@ -2,6 +2,39 @@
 
 ## All notable changes to this project will be documented in this file
 
+## [0.15.0] - 2026-02-15
+
+### Added
+
+- New Rich TUI with color-coded forensic tables.
+- Semantic version comparison using `packaging.version`.
+- Animated status spinner during PyPI data retrieval.
+
+### Fixed
+
+- Resolved relative import errors when running as a script.
+- Corrected false-positive update notifications.
+  eval.
+
+## [0.14.0] - 2026-02-15
+
+### Added
+
+- Refactored core logic into `checker_logic.py` for modularity.
+- Added `check_velocity` engine to detect rapid-fire release patterns.
+- Added `check_identity` engine to flag generic emails on branded packages.
+
+## [0.13.0] - 2026-02-15
+
+### Added
+
+- Implemented `install_shell_hook` for automatic package interception.
+- Added `verify_whitelist_integrity` using SHA-256 signatures.
+- Introduced `spectr sign` command for whitelist authorization.
+  eption.
+- Added `verify_whitelist_integrity` using SHA-256 signatures.
+- Introduced `spectr sign` command for whitelist authorization.
+
 ## [0.12.0] - Upcoming
 
 ### Planned

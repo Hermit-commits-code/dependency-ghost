@@ -12,7 +12,9 @@ authors = [
     {name = "Joseph Chu", email = "hotcupofjoe2013@gmail.com"}
 ]
 dependencies=[
-    "requests>=2.31.0"
+    "packaging>=26.0",
+    "requests>=2.31.0",
+    "rich>=14.3.2",
 ]
 
 [project.scripts]

@@ -1,4 +1,5 @@
 # Append to tests/test_forensics.py
+import pytest
 import requests
 
 from spectr.checker import check_for_updates, check_identity
@@ -70,3 +71,9 @@ def test_whitelist_bypass(mocker):
 
     # CONFIRMATION: The update check for 'spectr' still happened
     assert "https://pypi.org/pypi/spectr/json" in urls_called
+
+
+def test_recursive_detection_logic():
+    # Placeholder for the recursive logic test
+    # We will ensure that Spectr follows the 'requires_dist' list
+    pass
