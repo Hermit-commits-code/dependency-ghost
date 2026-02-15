@@ -188,3 +188,52 @@ def get_dependencies(pypi_data):
             clean_deps.append(name.lower())
 
     return list(set(clean_deps))  # Return unique names
+
+
+def check_resurrection(data):
+    """Flags packages from accounts that were dormant for >2 years and suddenly released."""
+    releases = data.get("releases", {})
+    if len(releases) < 2:
+        return True, {"status": "new_account"}
+
+    upload_times = []
+    for version_releases in releases.values():
+        for r in version_releases:
+            upload_times.append(
+                datetime.fromisoformat(r["upload_time"].replace("Z", ""))
+            )
+
+    upload_times.sort()
+
+    # Calculate gaps between consecutive releases
+    max_gap_days = 0
+    for i in range(1, len(upload_times)):
+        gap = (upload_times[i] - upload_times[i - 1]).days
+        max_gap_days = max(max_gap_days, gap)
+
+    # If the biggest gap is > 730 days (2 years) AND the latest release is recent
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    latest_release_age = (now - upload_times[-1]).days
+
+    if max_gap_days > 730 and latest_release_age < 30:
+        return False, {"max_dormancy_days": max_gap_days, "recent_activity": True}
+
+    return True, {"max_dormancy_days": max_gap_days}
+
+
+def scan_payload(package_name, data):
+    info = data.get("info", {})
+    version = info.get("version")
+    releases = data.get("releases", {}).get(version, [])
+
+    suspicious_files = []
+    for r in releases:
+        filename = r.get("filename", "").lower()
+        # Flag binary or script extensions that don't belong in a pure Python pkg
+        if any(ext in filename for ext in [".exe", ".msi", ".sh", ".bat", ".bin"]):
+            suspicious_files.append(filename)
+
+    passed = len(suspicious_files) == 0
+    meta = {"suspicious_extensions": suspicious_files if suspicious_files else "none"}
+
+    return passed, meta

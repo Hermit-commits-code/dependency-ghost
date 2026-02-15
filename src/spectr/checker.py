@@ -9,7 +9,7 @@ from packaging import version
 from rich.console import Console
 from rich.table import Table
 
-from spectr.checker_logic import check_for_typosquatting, disable_hooks
+from spectr.checker_logic import check_for_typosquatting, check_resurrection, disable_hooks, scan_payload
 
 VERSION = "0.15.0"
 console = Console()
@@ -215,12 +215,6 @@ def check_identity(package_name, data):
     return True, meta
 
 
-def scan_payload(package_name, data):
-    """Placeholder for v0.15.0 static analysis."""
-    # We will expand this to unzip and search files later
-    return True, {"analysis": "static_check_skipped"}
-
-
 def is_package_suspicious(data):
     """v0.3.0: Basic Age Check (The 72-hour rule)."""
     releases = data.get("releases", {})
@@ -383,6 +377,7 @@ def main():
                 "Velocity": check_velocity(data),
                 "Identity": check_identity(current_pkg, data),
                 "Structure": check_structure(data),
+                "Resurrection": check_resurrection(data),  # New heuristic live!
                 "Payload": scan_payload(current_pkg, data),
             }
 
