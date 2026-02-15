@@ -11,4 +11,5 @@ src/spectr.egg-info/dependency_links.txt
 src/spectr.egg-info/entry_points.txt
 src/spectr.egg-info/requires.txt
 src/spectr.egg-info/top_level.txt
+tests/test_forensics.py
 tests/test_v060.py

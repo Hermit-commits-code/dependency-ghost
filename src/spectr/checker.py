@@ -5,9 +5,14 @@ import sys
 from datetime import datetime, timezone
 
 import requests
+from packaging import version
+from rich.console import Console
+from rich.table import Table
 
-from .checker_logic import check_for_typosquatting, disable_hooks
+from spectr.checker_logic import check_for_typosquatting, disable_hooks
 
+VERSION = "0.15.0"
+console = Console()
 WHITELIST_FILE = os.path.expanduser("~/.spectr-whitelist")
 
 
@@ -76,6 +81,8 @@ def fetch_pypi_data(package_name):
         headers = {
             "User-Agent": "Spectr-Security-Tool/0.10.0 (https://github.com/Hermit-commits-code/spectr)",
             "Accept": "application/json",
+            "Cache-Control": "no-cache",
+            "Pragma": "no-cache",
         }
         response = requests.get(url, headers=headers, timeout=5, verify=True)
         if response.status_code == 200:
@@ -208,6 +215,12 @@ def check_identity(package_name, data):
     return True, meta
 
 
+def scan_payload(package_name, data):
+    """Placeholder for v0.15.0 static analysis."""
+    # We will expand this to unzip and search files later
+    return True, {"analysis": "static_check_skipped"}
+
+
 def is_package_suspicious(data):
     """v0.3.0: Basic Age Check (The 72-hour rule)."""
     releases = data.get("releases", {})
@@ -239,13 +252,14 @@ def sign_whitelist():
 
 
 def check_for_updates(current_version):
-    """v0.12.0: Checks PyPI to see if a newer version of Spectr exists."""
     try:
         # We query the PyPI JSON API for Spectr's metadata
         response = requests.get("https://pypi.org/pypi/spectr/json", timeout=1.5)
         if response.status_code == 200:
             latest_version = response.json()["info"]["version"]
-            if latest_version != current_version:
+
+            # Use packaging.version to compare correctly (e.g., 0.15.0 > 0.5)
+            if version.parse(latest_version) > version.parse(current_version):
                 print(
                     f"🔔 NOTICE: A new version of Spectr is available ({latest_version})."
                 )
@@ -255,13 +269,26 @@ def check_for_updates(current_version):
         pass
 
 
+def display_report(package, results):
+    table = Table(
+        title=f"Spectr Forensic Report: [bold blue]{package}[/bold blue]",
+        header_style="bold magenta",
+    )
+    table.add_column("Heuristic", style="cyan")
+    table.add_column("Status", justify="center")
+    table.add_column("Forensic Evidence", style="white")
+
+    for check_name, (passed, meta) in results.items():
+        status = "[green]PASS[/green]" if passed else "[red]FAIL[/red]"
+        table.add_row(check_name, status, str(meta))
+
+    console.print("\n")
+    console.print(table)
+
+
 # --- MAIN EXECUTION ---
-
-
 def main():
-    # v0.14.0 Metadata
-    VERSION = "0.14.0"
-
+    global VERSION
     ensure_whitelist_exists()
     parser = argparse.ArgumentParser(
         description="🛡️  Spectr: Proactive Supply-Chain Defense"
@@ -278,7 +305,12 @@ def main():
         "-v", "--verbose", action="store_true", help="Show forensic metrics"
     )
     parser.add_argument("--json", action="store_true", help="Output results as JSON")
-
+    parser.add_argument(
+        "--recursive",
+        "-r",
+        action="store_true",
+        help="Audit the entire dependency tree",
+    )
     args = parser.parse_args()
 
     # --- 1. Priority Administrative Actions ---
@@ -321,32 +353,31 @@ def main():
     if is_squat:
         sys.exit(1)
 
-    # Suppress standard output if JSON is requested to keep stdout clean
-    if not args.json:
-        print(f"🛡️  Spectr is analyzing {package}...")
+    # --- 6. Data Fetching & 7. The Forensic Suite ---
+    with console.status(f"[bold green]Auditing {package}...", spinner="dots"):
+        data = fetch_pypi_data(package)
 
-    # --- 6. Data Fetching ---
-    data = fetch_pypi_data(package)
-    if not data:
-        if args.json:
-            import json
+        if not data:
+            if args.json:
+                import json
 
-            print(
-                json.dumps(
-                    {"package": package, "error": "not_found", "safety": "unknown"}
+                print(
+                    json.dumps(
+                        {"package": package, "error": "not_found", "safety": "unknown"}
+                    )
                 )
-            )
-        else:
-            print(f"❓ Could not find {package} on PyPI.")
-        sys.exit(0)
+            else:
+                console.print(f"[yellow]❓ Could not find {package} on PyPI.[/yellow]")
+            sys.exit(0)
 
-    # --- 7. The Forensic Suite ---
-    results = {
-        "Reputation": check_reputation(package, data),
-        "Velocity": check_velocity(data),
-        "Identity": check_identity(package, data),
-        "Structure": check_structure(data),
-    }
+        # Analysis happens while the spinner is still active
+        results = {
+            "Reputation": check_reputation(package, data),
+            "Velocity": check_velocity(data),
+            "Identity": check_identity(package, data),
+            "Structure": check_structure(data),
+            "Payload": scan_payload(package, data),
+        }
 
     all_passed = all(status for status, meta in results.values())
 
@@ -366,22 +397,19 @@ def main():
         print(json.dumps(output, indent=2))
         sys.exit(0 if all_passed else 1)
 
-    # --- 9. Verbose Reporting (Human-Readable Details) ---
-    if args.verbose:
-        print("\n🔍 Forensic Metrics:")
-        for name, (passed, meta) in results.items():
-            status_icon = "✅" if passed else "❌"
-            metrics = ", ".join([f"{k}: {v}" for k, v in meta.items()])
-            print(f"   {status_icon} {name:12}: {metrics}")
+    # --- 9. Reporting (Human-Readable) ---
+    display_report(package, results)
 
     # --- 10. Final Gatekeeper Logic ---
     if not all_passed:
-        print("\n🛑 SECURITY RISK: Forensic anomalies detected.")
-        if not args.verbose:
-            print("   Run with --verbose for detailed metrics.")
+        console.print(
+            "\n[bold red]🛑 SECURITY RISK:[/bold red] Forensic anomalies detected."
+        )
         sys.exit(1)
 
-    print(f"\n✅ {package} appears established and safe.")
+    console.print(
+        f"\n[bold green]✅ {package}[/bold green] appears established and safe."
+    )
     sys.exit(0)
 
 
