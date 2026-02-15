@@ -2,6 +2,19 @@
 
 ## All notable changes to this project will be documented in this file
 
+## [0.10.0] - 2026-02-15
+
+### Changed
+
+- **Rebranding**: Complete migration from 'Ghost' to 'Spectr'.
+- **File Structure**: Transitioned to `src/spectr/` layout for better package management.
+- **Whitelist Migration**: Trusted packages now managed in `~/.spectr-whitelist`.
+
+### Added
+
+- **Structural Analysis Engine**: Detecting 'Skeleton' or 'Ghost' packages by analyzing source distribution (sdist) size.
+- **Integrity Signing**: New `spectr sign` command to authorize whitelist changes.
+
 ## [0.9.0] - 2026-02-15
 
 ### Added
