@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.19.0] - 2026-02-16
+
+### Added
+
+- **Persistence Layer**: Integrated SQLite-based audit caching in `~/.spectr/audit_cache.db`.
+- **Performance**: Near-instantaneous re-audits for cached package versions (24-hour TTL).
+- **Stateful Memory**: Spectr now remembers forensic scores across different terminal sessions.
+
 ## [0.18.0] - 2026-02-15
 
 ### Added

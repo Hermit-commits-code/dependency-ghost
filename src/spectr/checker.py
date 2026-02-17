@@ -9,6 +9,7 @@ from packaging import version
 from rich.console import Console
 from rich.table import Table
 
+from spectr.cache import CacheManager
 from spectr.checker_logic import (
     calculate_spectr_score,
     check_for_typosquatting,
@@ -17,7 +18,9 @@ from spectr.checker_logic import (
     scan_payload,
 )
 
-VERSION = "0.18.0"
+cache = CacheManager()
+
+VERSION = "0.19.0"
 console = Console()
 WHITELIST_FILE = os.path.expanduser("~/.spectr-whitelist")
 
@@ -383,6 +386,23 @@ def main():
                 visited.add(current_pkg)
                 continue
 
+            pkg_version = data.get("info", {}).get("version", "0.0.0")
+            cached_audit = cache.get_cached_audit(current_pkg, pkg_version)
+
+            if cached_audit:
+                pkg_score, pkg_findings = cached_audit
+                all_results[current_pkg] = pkg_findings
+                # Continue dependency discovery even on cache hit
+                if args.recursive and current_depth < args.max_depth:
+                    from spectr.checker_logic import get_dependencies
+
+                    sub_deps = get_dependencies(data)
+                    for dep in sub_deps:
+                        if dep not in visited:
+                            task_queue.append((dep, current_depth + 1))
+                visited.add(current_pkg)
+                continue
+            # ---------------------------
             # Run Forensics
             pkg_findings = {
                 "Reputation": check_reputation(current_pkg, data),
@@ -396,6 +416,7 @@ def main():
             pkg_score = calculate_spectr_score(pkg_findings)
             pkg_findings["score"] = pkg_score  # Store it in the results
             all_results[current_pkg] = pkg_findings
+            cache.save_audit(current_pkg, pkg_version, pkg_score, pkg_findings)
             visited.add(current_pkg)
 
             # If recursive flag is set, find more friends to audit
