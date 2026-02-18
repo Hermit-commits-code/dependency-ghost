@@ -15,13 +15,13 @@
 
 ### Removed
 
-- **Redundancy**: Deleted `src/spectr/similarity.py` and `src/spectr/interceptor.py`.
+- **Redundancy**: Deleted `src/skopos/similarity.py` and `src/skopos/interceptor.py`.
 
 ## [0.21.0] - 2026-02-16
 
 ### Added
 
-- **The Persistence Layer**: Integrated SQLite-based audit caching (`~/.spectr/audit_cache.db`).
+- **The Persistence Layer**: Integrated SQLite-based audit caching (`~/.skopos/audit_cache.db`).
 - **Sandbox v2**: Implemented `RestrictedPython` for safe metadata snippet execution.
 
 ## [0.20.0] - 2026-02-16
@@ -35,15 +35,15 @@
 
 ### Added
 
-- **Persistence Layer**: Integrated SQLite-based audit caching in `~/.spectr/audit_cache.db`.
+- **Persistence Layer**: Integrated SQLite-based audit caching in `~/.skopos/audit_cache.db`.
 - **Performance**: Near-instantaneous re-audits for cached package versions (24-hour TTL).
-- **Stateful Memory**: Spectr now remembers forensic scores across different terminal sessions.
+- **Stateful Memory**: Skopos now remembers forensic scores across different terminal sessions.
 
 ## [0.18.0] - 2026-02-15
 
 ### Added
 
-- **The Brain**: Implemented the SpectrScore weighted 0-100 risk engine.
+- **The Brain**: Implemented the SkoposScore weighted 0-100 risk engine.
 - **Giant's Immunity**: Prevention of false positives on legacy giants like NumPy/Pandas.
 - **Fix**: Resolved integer unpacking TypeErrors in recursive loops.
 
@@ -101,7 +101,7 @@
 ### Added
 
 - **Identity & Structure**: Detecting "Skeleton" packages and brand-jacking.
-- **Rebranding**: Finalized migration from "Ghost" to **Spectr**.
+- **Rebranding**: Finalized migration from "Ghost" to **Skopos**.
 
 ## [0.9.0] - 2026-02-15
 
@@ -137,7 +137,7 @@
 
 ### Added
 
-- **The Trust Update**: Initial implementation of the `~/.spectr-whitelist` system.
+- **The Trust Update**: Initial implementation of the `~/.skopos-whitelist` system.
 
 ## [0.4.0] - 2026-02-15
 
@@ -150,13 +150,13 @@
 ### Added
 
 - Multi-Package Support for interception loops.
-- **The Kill Switch**: `spectr-off` command to remove shell aliases.
+- **The Kill Switch**: `skopos-off` command to remove shell aliases.
 
 ## [0.2.0] - 2026-02-14
 
 ### Added
 
-- `spectr-init` command to generate shell interception logic.
+- `skopos-init` command to generate shell interception logic.
 
 ## [0.1.0] - 2026-02-14
 
@@ -176,7 +176,7 @@
 
 ### Added
 
-- **The Trust Update**: Initial implementation of the `~/.spectr-whitelist` system.
+- **The Trust Update**: Initial implementation of the `~/.skopos-whitelist` system.
 
 ## [0.4.0] - 2026-02-15
 
@@ -189,13 +189,13 @@
 ### Added
 
 - Multi-Package Support for interception loops.
-- **The Kill Switch**: `spectr-off` command to remove shell aliases.
+- **The Kill Switch**: `skopos-off` command to remove shell aliases.
 
 ## [0.2.0] - 2026-02-14
 
 ### Added
 
-- `spectr-init` command to generate shell interception logic.
+- `skopos-init` command to generate shell interception logic.
 
 ## [0.1.0] - 2026-02-14
 

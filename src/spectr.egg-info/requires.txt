@@ -1,4 +1,0 @@
-requests>=2.31.0
-restrictedpython>=8.1
-rich>=14.3.2
-packaging>=26.0

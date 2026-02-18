@@ -280,7 +280,7 @@ wheels = [
 ]
 
 [[package]]
-name = "spectr"
+name = "skopos-audit"
 version = "0.22.0"
 source = { editable = "." }
 dependencies = [

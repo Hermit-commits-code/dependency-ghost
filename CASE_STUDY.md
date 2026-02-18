@@ -2,7 +2,7 @@
 
 ## 🛡️ Executive Summary
 
-This document outlines the **Social Proof Deception** model—a high-frequency attack pattern on package registries. **Spectr** is designed to neutralize this threat by replacing "Visual Trust" (downloads/stars) with **Behavioral Heuristics**.
+This document outlines the **Social Proof Deception** model—a high-frequency attack pattern on package registries. **Skopos** is designed to neutralize this threat by replacing "Visual Trust" (downloads/stars) with **Behavioral Heuristics**.
 
 ---
 
@@ -18,25 +18,25 @@ The "Inflated Trust" model exploits the human tendency to trust large numbers. A
 
 ---
 
-## 🛡️ Spectr Heuristic Defense Layer
+## 🛡️ Skopos Heuristic Defense Layer
 
-Spectr treats all new packages as "untrusted" regardless of popularity metrics.
+Skopos treats all new packages as "untrusted" regardless of popularity metrics.
 
 ### Heuristic 1: The Zero-Trust Window
 
-Spectr enforces a **72-hour vetting period**. This is the critical window where security researchers typically identify and report malicious packages.
+Skopos enforces a **72-hour vetting period**. This is the critical window where security researchers typically identify and report malicious packages.
 
 - **Effect**: Negates the "speed" advantage of a new supply-chain attack.
 
 ### Heuristic 2: The Popularity Anomaly Check
 
-Spectr calculates the ratio of **Downloads vs. Age**.
+Skopos calculates the ratio of **Downloads vs. Age**.
 
 - **The Math**: If $Downloads > 10,000$ and $Age < 7 \text{ days}$, the package is flagged as a high-probability bot-inflation target.
 
 ### Heuristic 3: Giant's Immunity (v0.22)
 
-To reduce false positives, Spectr applies "Seniority Heuristics." If a project has **>50 releases** or a massive historical age, metadata gaps (like missing emails) are de-prioritized.
+To reduce false positives, Skopos applies "Seniority Heuristics." If a project has **>50 releases** or a massive historical age, metadata gaps (like missing emails) are de-prioritized.
 
 - **Effect**: Stops flagging critical infrastructure like `requests` or `numpy`.
 
@@ -48,7 +48,7 @@ Suspicious metadata (description strings or setup scripts) is passed through a *
 
 ## 🏁 Conclusion
 
-By using **Spectr**, developers move from **Passive Trust** (believing numbers) to **Active Verification** (analyzing behavior). This shift is essential for defending modern Python environments against sophisticated supply-chain deception.
+By using **Skopos**, developers move from **Passive Trust** (believing numbers) to **Active Verification** (analyzing behavior). This shift is essential for defending modern Python environments against sophisticated supply-chain deception.
 
 - **Effect**: Stops flagging critical infrastructure like `requests` or `numpy`.
 
@@ -60,4 +60,4 @@ Suspicious metadata (description strings or setup scripts) is passed through a *
 
 ## 🏁 Conclusion
 
-By using **Spectr**, developers move from **Passive Trust** (believing numbers) to **Active Verification** (analyzing behavior). This shift is essential for defending modern Python environments against sophisticated supply-chain deception.
+By using **Skopos**, developers move from **Passive Trust** (believing numbers) to **Active Verification** (analyzing behavior). This shift is essential for defending modern Python environments against sophisticated supply-chain deception.

@@ -14,4 +14,4 @@ dist/
 
 # OS
 .DS_Store
-.spectr-whitelist
+.skopos-whitelist

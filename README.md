@@ -1,4 +1,4 @@
-# 🛡️ Spectr
+# 🛡️ Skopos
 
 ![Version](https://img.shields.io/badge/version-0.22.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -12,7 +12,7 @@ malicious payloads before they ever reach your local environment.
 
 ## Table of Contents
 
-- [🛡️ Spectr](#️-spectr)
+- [🛡️ Skopos](#️-skopos)
   - [Table of Contents](#table-of-contents)
   - [🚀 Quick Start](#-quick-start)
     - [🔍 Instant Audit](#-instant-audit)
@@ -37,54 +37,54 @@ malicious payloads before they ever reach your local environment.
 Analyze a package instantly using `uvx`:
 
 ```bash
-uvx spectr check <package_name>
+uvx skopos check <package_name>
 ```
 
 ### 🛠️ Permanent Protection
 
-Install Spectr and enable shell hooks to automatically intercept `uv` and
+Install Skopos and enable shell hooks to automatically intercept `uv` and
 `pip` commands:
 
 ```bash
-pip install spectr
-spectr --install-hook
+pip install skopos
+skopos --install-hook
 ```
 
 Once installed, running `uv add <package>` (or other wrapped commands) will
-trigger a Spectr audit. If a package is flagged, the installation is blocked
+trigger a Skopos audit. If a package is flagged, the installation is blocked
 until you manually authorize it.
 
 ## 📦 Installation & System Footprint
 
-Spectr maintains a minimal and predictable footprint on the host system.
+Skopos maintains a minimal and predictable footprint on the host system.
 
 1. Software installation
 
    Installed via `pip` (or `uv`) into your environment's site-packages:
 
    ```text
-   Path: .venv/lib/python3.x/site-packages/spectr/
+   Path: .venv/lib/python3.x/site-packages/skopos/
    ```
 
 2. Local configuration & data
 
-   Spectr stores state and persistent data under the user's home directory:
-   - `Directory: ~/.spectr/`
+   Skopos stores state and persistent data under the user's home directory:
+   - `Directory: ~/.skopos/`
    - `audit_cache.db`: a local SQLite database storing forensic scores for
      24 hours to optimize performance.
-   - `~/.spectr-whitelist`: a list of authorized packages.
-   - `~/.spectr-whitelist.sig`: a SHA-256 signature file ensuring whitelist
+   - `~/.skopos-whitelist`: a list of authorized packages.
+   - `~/.skopos-whitelist.sig`: a SHA-256 signature file ensuring whitelist
      integrity against unauthorized tampering.
 
 3. Shell interception
 
-   Running `spectr --install-hook` appends a lightweight wrapper to your shell
-   profile (`~/.zshrc` or `~/.bashrc`). The wrapper invokes Spectr to verify
+   Running `skopos --install-hook` appends a lightweight wrapper to your shell
+   profile (`~/.zshrc` or `~/.bashrc`). The wrapper invokes Skopos to verify
    package safety before allowing `uv add` / `pip install` to proceed.
 
 ## 🧠 Forensic Capabilities (v0.22)
 
-Spectr uses a weighted 0–100 Security Score to evaluate risk and includes:
+Skopos uses a weighted 0–100 Security Score to evaluate risk and includes:
 
 - **Typosquatting Detection** — Uses Levenshtein distance to catch look-alike
   packages (e.g., `reqests` vs `requests`).
@@ -102,16 +102,16 @@ Spectr uses a weighted 0–100 Security Score to evaluate risk and includes:
 Common commands:
 
 ```bash
-spectr audit              # Scan the current project's pyproject.toml
-spectr check <package>    # Perform a deep forensic scan on a specific package
-spectr --install-hook     # Inject security wrappers into ~/.bashrc or ~/.zshrc
-spectr --disable          # Remove shell interceptions and restore defaults
-spectr -r --max-depth 2   # Perform a recursive audit of a dependency tree
+skopos audit              # Scan the current project's pyproject.toml
+skopos check <package>    # Perform a deep forensic scan on a specific package
+skopos --install-hook     # Inject security wrappers into ~/.bashrc or ~/.zshrc
+skopos --disable          # Remove shell interceptions and restore defaults
+skopos -r --max-depth 2   # Perform a recursive audit of a dependency tree
 ```
 
 ## 🛡️ Trust & Whitelisting
 
-Spectr maintains a cryptographically signed whitelist at `~/.spectr-whitelist`.
+Skopos maintains a cryptographically signed whitelist at `~/.skopos-whitelist`.
 
 - If a package is flagged during an audit, you can choose to trust it locally
   by adding it to the whitelist.
@@ -124,10 +124,10 @@ For developers and auditors, the codebase follows a consolidated, modular
 architecture:
 
 ```text
-spectr/
+skopos/
 ├── pyproject.toml         # Project metadata and entry points
 ├── src/
-│   └── spectr/            # Source root
+│   └── skopos/            # Source root
 │       ├── __init__.py
 │       ├── checker.py     # Main CLI & whitelist management
 │       ├── checker_logic.py # Forensic heuristics & scoring
@@ -140,7 +140,7 @@ spectr/
 
 ## 📊 Feature Comparison
 
-| Feature         |  Standard Package Managers |              Spectr (v0.22.0) |
+| Feature         |  Standard Package Managers |              Skopos (v0.22.0) |
 | --------------- | -------------------------: | ----------------------------: |
 | Primary Goal    |  Installation & Resolution |          Supply-Chain Defense |
 | Trust Model     | Implicit (Trusts Registry) |        Zero-Trust (Heuristic) |
@@ -150,7 +150,7 @@ spectr/
 
 ## 🗺️ Roadmap & Future Ideas
 
-Spectr is evolving from a local utility into a comprehensive security framework.
+Skopos is evolving from a local utility into a comprehensive security framework.
 
 ### v0.23: The Intelligence Layer
 
@@ -167,4 +167,4 @@ Spectr is evolving from a local utility into a comprehensive security framework.
 
 Distributed under the MIT License. See the `LICENSE` file for details.
 
-Maintained by Joseph Chu — Spectr GitHub
+Maintained by Joseph Chu — Skopos GitHub

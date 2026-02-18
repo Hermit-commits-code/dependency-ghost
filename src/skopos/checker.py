@@ -9,23 +9,25 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
-from spectr.cache import CacheManager
-from spectr.checker_logic import (
-    calculate_spectr_score,
+from skopos.cache import CacheManager
+from skopos.checker_logic import (
+    calculate_skopos_score,
     check_author_reputation,
     check_for_typosquatting,
     check_reputation,
     check_resurrection,
     disable_hooks,
     scan_payload,
+    check_for_updates,
+    check_identity
 )
-from spectr.sandbox import execute_in_sandbox
+from skopos.sandbox import execute_in_sandbox
 
 # --- CONFIGURATION ---
 VERSION = "0.22.0"
 console = Console()
 cache = CacheManager()
-WHITELIST_FILE = os.path.expanduser("~/.spectr-whitelist")
+WHITELIST_FILE = os.path.expanduser("~/.skopos-whitelist")
 SIG_FILE = WHITELIST_FILE + ".sig"
 
 # --- WHITELIST & INTEGRITY ---
@@ -34,7 +36,7 @@ SIG_FILE = WHITELIST_FILE + ".sig"
 def ensure_whitelist_exists():
     if not os.path.exists(WHITELIST_FILE):
         with open(WHITELIST_FILE, "w") as f:
-            f.write("# Spectr Whitelist - Trusted packages\n")
+            f.write("# Skopos Whitelist - Trusted packages\n")
         sign_whitelist()
 
 
@@ -109,14 +111,14 @@ def check_package(package, args, depth=0):
 
     findings = {
         "Typosquatting": typo_check,
-        "Identity": check_author_reputation(data),
+        "Identity": check_author_reputation(package, data), # <-- Add 'package' here
         "Reputation": check_reputation(package, data),
         "Resurrection": check_resurrection(data),
         "Payload": (payload_passed, payload_meta),
         "Sandbox": (sandbox_passed, sandbox_meta),
     }
 
-    score = calculate_spectr_score(findings)
+    score = calculate_skopos_score(findings)
     cache.save_audit(package, info.get("version", "0.0.0"), score, findings)
     display_report(package, findings, score)
 
@@ -126,7 +128,7 @@ def check_package(package, args, depth=0):
 def display_report(package, results, score):
     color = "green" if score >= 80 else "yellow" if score >= 50 else "red"
     table = Table(
-        title=f"Spectr Report: [bold]{package}[/bold] (Score: [{color}]{score}[/{color}])"
+        title=f"Skopos Report: [bold]{package}[/bold] (Score: [{color}]{score}[/{color}])"
     )
     table.add_column("Heuristic", style="cyan")
     table.add_column("Status")
@@ -151,7 +153,7 @@ def display_report(package, results, score):
 def audit_project(args):
     console.print(
         Panel(
-            "🔍 [bold]Spectr Project Audit[/bold]\nTarget: pyproject.toml", expand=False
+            "🔍 [bold]Skopos Project Audit[/bold]\nTarget: pyproject.toml", expand=False
         )
     )
     try:
@@ -191,7 +193,7 @@ def audit_project(args):
 def install_shell_hook():
     shell = os.environ.get("SHELL", "")
     rc = os.path.expanduser("~/.zshrc" if "zsh" in shell else "~/.bashrc")
-    hook = f'\n# Spectr v{VERSION}\nuv() {{ if [[ "$1" == "add" ]]; then spectr check "$2" || return 1; fi; command uv "$@"; }}\n'
+    hook = f'\n# Skopos v{VERSION}\nuv() {{ if [[ "$1" == "add" ]]; then skopos check "$2" || return 1; fi; command uv "$@"; }}\n'
     with open(rc, "a") as f:
         f.write(hook)
     console.print(f"✅ Hook installed in {rc}.")
@@ -208,12 +210,12 @@ def main():
 
     # 2. Setup Base Parser
     parser = argparse.ArgumentParser(
-        prog="spectr",
-        description=f"🛡️ Spectr v{VERSION}: Proactive Supply-Chain Defense",
+        prog="skopos",
+        description=f"🛡️ Skopos v{VERSION}: Proactive Supply-Chain Defense",
     )
 
     # Add explicit version flag
-    parser.add_argument("--version", action="version", version=f"Spectr v{VERSION}")
+    parser.add_argument("--version", action="version", version=f"Skopos v{VERSION}")
 
     # Global Flags
     parser.add_argument(
@@ -224,7 +226,7 @@ def main():
     )
 
     # 3. Setup Subcommands (check, audit)
-    subparsers = parser.add_subparsers(dest="command", help="Spectr Forensic Commands")
+    subparsers = parser.add_subparsers(dest="command", help="Skopos Forensic Commands")
 
     # Command: 'check'
     check_p = subparsers.add_parser("check", help="Audit a specific package from PyPI")
