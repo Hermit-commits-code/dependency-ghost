@@ -86,6 +86,9 @@ def fetch_pypi_data(package_name):
 
 def check_package(package, args, depth=0):
     if is_whitelisted(package):
+        console.print(
+            f"✅ [bold green]{package}[/bold green] is in your trusted whitelist. Skipping forensic audit."
+        )
         return True, 100
 
     cached = cache.get_cached_audit(package, "latest")
@@ -195,38 +198,78 @@ def install_shell_hook():
 
 
 def main():
-    """v0.22.0: Official Entry Point"""
+    """v0.22.0: Official Entry Point - Forensic Gatekeeper"""
+
+    # 1. Security First: Verify Whitelist Integrity
     ensure_whitelist_exists()
     if not verify_whitelist_integrity():
         console.print("🚨 [bold red]WHITELIST TAMPERED![/bold red] Signature mismatch.")
         sys.exit(1)
 
-    parser = argparse.ArgumentParser(prog="spectr", description=f"🛡️ Spectr v{VERSION}")
+    # 2. Setup Base Parser
+    parser = argparse.ArgumentParser(
+        prog="spectr",
+        description=f"🛡️ Spectr v{VERSION}: Proactive Supply-Chain Defense",
+    )
+
+    # Add explicit version flag
     parser.add_argument("--version", action="version", version=f"Spectr v{VERSION}")
-    subparsers = parser.add_subparsers(dest="command")
 
-    check_p = subparsers.add_parser("check")
-    check_p.add_argument("package")
-    audit_p = subparsers.add_parser("audit")
+    # Global Flags
+    parser.add_argument(
+        "--install-hook", action="store_true", help="Install shell hooks for uv/pip"
+    )
+    parser.add_argument(
+        "--disable", action="store_true", help="Disable and remove shell hooks"
+    )
 
-    for p in [check_p, audit_p]:
-        p.add_argument("--recursive", "-r", action="store_true")
-        p.add_argument("--max-depth", type=int, default=2)
+    # 3. Setup Subcommands (check, audit)
+    subparsers = parser.add_subparsers(dest="command", help="Spectr Forensic Commands")
 
-    parser.add_argument("--install-hook", action="store_true")
-    parser.add_argument("--disable", action="store_true")
+    # Command: 'check'
+    check_p = subparsers.add_parser("check", help="Audit a specific package from PyPI")
+    check_p.add_argument("package", help="The name of the package to check")
+    check_p.add_argument(
+        "--recursive",
+        "-r",
+        action="store_true",
+        help="Audit the entire dependency tree",
+    )
+    check_p.add_argument(
+        "--max-depth", type=int, default=2, help="Depth for recursive auditing"
+    )
 
+    # Command: 'audit'
+    audit_p = subparsers.add_parser(
+        "audit", help="Audit the current project (pyproject.toml/requirements.txt)"
+    )
+    audit_p.add_argument(
+        "--recursive", "-r", action="store_true", help="Deep audit project dependencies"
+    )
+    audit_p.add_argument(
+        "--max-depth", type=int, default=2, help="Depth for recursive auditing"
+    )
+
+    # 4. Parsing
     args = parser.parse_args()
 
+    # 5. Execution Logic (The "Brain")
     if args.install_hook:
         install_shell_hook()
-    elif args.disable:
+        sys.exit(0)
+
+    if args.disable:
         disable_hooks()
-    elif args.command == "check":
+        sys.exit(0)
+
+    if args.command == "check":
+        # Pass the package and the args namespace to the engine
         check_package(args.package, args)
     elif args.command == "audit":
+        # Pass the args namespace to the project auditor
         audit_project(args)
     else:
+        # If no command and no global flag, show help
         parser.print_help()
 
 

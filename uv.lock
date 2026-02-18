@@ -281,37 +281,35 @@ wheels = [
 
 [[package]]
 name = "spectr"
-version = "0.21.1"
+version = "0.22.0"
 source = { editable = "." }
 dependencies = [
-    { name = "colorama" },
     { name = "packaging" },
     { name = "requests" },
     { name = "restrictedpython" },
     { name = "rich" },
-    { name = "ruff" },
 ]
 
 [package.dev-dependencies]
 dev = [
     { name = "pytest" },
     { name = "pytest-mock" },
+    { name = "ruff" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "colorama", specifier = ">=0.4.6" },
     { name = "packaging", specifier = ">=26.0" },
     { name = "requests", specifier = ">=2.31.0" },
     { name = "restrictedpython", specifier = ">=8.1" },
     { name = "rich", specifier = ">=14.3.2" },
-    { name = "ruff", specifier = ">=0.15.1" },
 ]
 
 [package.metadata.requires-dev]
 dev = [
     { name = "pytest", specifier = ">=9.0.2" },
     { name = "pytest-mock", specifier = ">=3.15.1" },
+    { name = "ruff", specifier = ">=0.15.1" },
 ]
 
 [[package]]
