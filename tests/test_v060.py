@@ -1,4 +1,4 @@
-from spectr.checker import check_reputation, check_velocity
+from skopos.checker import check_reputation, check_velocity
 
 
 def test_inflated_trust_attack():

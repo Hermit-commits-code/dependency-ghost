@@ -1,7 +1,7 @@
-- id: spectr-check
-  name: spectr-check
-  description: "Runs Spectr behavioral analysis on dependencies."
-  entry: spectr check
+- id: skopos-check
+  name: skopos-check
+  description: "Runs skopos behavioral analysis on dependencies."
+  entry: skopos check
   language: python
   types: [text]
   files: ^(pyproject\.toml|requirements\.txt)$

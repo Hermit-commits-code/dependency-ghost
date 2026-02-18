@@ -110,20 +110,48 @@ def check_resurrection(data: dict):
     return True, {"max_gap": max_gap}
 
 
-def check_author_reputation(data: dict):
-    """v0.22: Analyzes author metadata with metadata relaxation for Giants."""
+def check_author_reputation(package_name: str, data: dict):
+    """
+    v0.22.1: Analyzes author metadata. 
+    Cross-references package names against email domains to detect brand-jacking.
+    """
     info = data.get("info", {}) or {}
     releases = data.get("releases", {})
     author = (info.get("author") or "").strip()
     email = (info.get("author_email") or "").strip()
 
+    # 1. Giant's Immunity: Established projects are exempt from metadata-gap flagging
     if len(releases) > 30:
-        return True, {"author": author or "Project Lead", "status": "Immune (Giant)"}
+        return True, {
+            "author": author or "Project Lead", 
+            "email": email, 
+            "status": "Immune (Giant)"
+        }
 
-    if not author or not email:
-        return False, {"reason": "Missing author or email contact"}
+    # 2. Basic Validation: We must at least have an email to track identity
+    if not email:
+        return False, {
+            "reason": "Missing author email contact", 
+            "author": author, 
+            "email": "None"
+        }
+
+    # 3. Brand-jacking Detection:
+    # If the package name claims to be from a major brand, the email must match.
+    target_brands = ["google", "microsoft", "amazon", "apple", "adobe", "openai"]
+    pkg_lower = package_name.lower()
+    email_lower = email.lower()
+    
+    for brand in target_brands:
+        if brand in pkg_lower:
+            # If 'google' is in the name, but the email isn't @google.com
+            if not email_lower.endswith(f"@{brand}.com"):
+                return False, {
+                    "reason": f"Suspected {brand.capitalize()} brand-jacking", 
+                    "email": email
+                }
+
     return True, {"author": author, "email": email}
-
 
 def check_reputation(package_name: str, data: dict):
     """v0.22: Detects bot-driven download inflation."""
@@ -193,7 +221,7 @@ def get_dependencies(pypi_data: dict) -> list:
     return list(set(clean_deps))
 
 
-def calculate_spectr_score(results: dict) -> int:
+def calculate_skopos_score(results: dict) -> int:
     """v0.22: Aggregates heuristics into a final safety score (0-100)."""
     score = 100
 
@@ -219,7 +247,7 @@ def calculate_spectr_score(results: dict) -> int:
 
 
 def disable_hooks():
-    """v0.11.0: Removes Spectr interception logic from shell RC files."""
+    """v0.11.0: Removes Skopos interception logic from shell RC files."""
     import os
 
     rc_file = os.path.expanduser(
@@ -229,9 +257,29 @@ def disable_hooks():
         return
     try:
         with open(rc_file, "r") as f:
-            lines = [l for l in f.readlines() if "Spectr" not in l and "uv()" not in l]
+            lines = [l for l in f.readlines() if "Skopos" not in l and "uv()" not in l]
         with open(rc_file, "w") as f:
             f.writelines(lines)
         print(f"🛡️  Hooks removed from {rc_file}.")
     except Exception as e:
         print(f"❌ Error disabling hooks: {e}")
+
+def check_identity(package_name, data):
+    """v0.22.1: Alias for author reputation to maintain test compatibility."""
+    return check_author_reputation(package_name, data)
+
+def check_for_updates(current_version):
+    """v0.22: Checks PyPI to see if a newer version of Skopos exists."""
+    url = "https://pypi.org/pypi/skopos/json"
+    try:
+        import requests
+        response = requests.get(url, timeout=3)
+        if response.status_code == 200:
+            latest = response.json().get("info", {}).get("version")
+            if latest != current_version:
+                # We return False to indicate an update is needed (as per your test logic)
+                return False, latest
+        return True, current_version
+    except Exception:
+        # If offline, we pass the check to avoid blocking the user
+        return True, current_version

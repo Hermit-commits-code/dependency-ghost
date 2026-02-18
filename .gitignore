@@ -5,7 +5,9 @@ __pycache__/
 *$py.class
 .venv/
 env/
-build/
+*.egg-info/
+__pycache__/
+.venv/
 dist/
 
 # IDEs
@@ -14,4 +16,4 @@ dist/
 
 # OS
 .DS_Store
-.spectr-whitelist
+.skopos-whitelist

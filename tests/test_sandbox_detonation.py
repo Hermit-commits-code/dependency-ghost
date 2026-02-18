@@ -1,4 +1,4 @@
-from spectr.sandbox import execute_in_sandbox
+from skopos.sandbox import execute_in_sandbox
 
 
 def test_detonation():

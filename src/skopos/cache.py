@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 class CacheManager:
-    def __init__(self, db_path="~/.spectr/audit_cache.db"):
+    def __init__(self, db_path="~/.skopos/audit_cache.db"):
         self.db_path = Path(db_path).expanduser()
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._init_db()
