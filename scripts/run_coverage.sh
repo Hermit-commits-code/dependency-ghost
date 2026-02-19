@@ -2,10 +2,20 @@
 set -euo pipefail
 
 # Run tests with coverage and produce terminal + XML reports
+# Prefer python3 but fall back to python if available.
+if command -v python3 >/dev/null 2>&1; then
+	PY=python3
+elif command -v python >/dev/null 2>&1; then
+	PY=python
+else
+	echo "Error: python3 or python not found on PATH. Install Python 3.10+ and retry." >&2
+	exit 1
+fi
+
 VENV=".venv_test"
-python -m venv "$VENV"
+"$PY" -m venv "$VENV"
 . "$VENV/bin/activate"
-python -m pip install --upgrade pip
+"$PY" -m pip install --upgrade pip
 pip install -e .[dev]
 pip install pytest-cov
 
