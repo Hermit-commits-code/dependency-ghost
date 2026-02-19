@@ -1,10 +1,13 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Skopos v0.23.0 - The uv Command Wrapper
-# This script intercepts 'add' and 'run' commands to perform a pre-install audit.
+# Skopos uv wrapper
+# Resolves repository root relative to this script and prefers python3
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPOROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 COMMAND=$1
-shift # Move to the arguments
+shift
 
 # Helper: run the skopos check using the installed CLI if available,
 # otherwise fall back to `python -m skopos.checker` when importable.
@@ -33,14 +36,19 @@ case "$COMMAND" in
             exit $?
         fi
 
-        if python -c "import importlib; importlib.import_module('skopos.checker')" >/dev/null 2>&1; then
-            python -m skopos.checker "$COMMAND" "$@"
+        PYEXEC=python3
+        if ! command -v "$PYEXEC" >/dev/null 2>&1; then
+            PYEXEC=python
+        fi
+
+        if "$PYEXEC" -c "import importlib, sys; importlib.import_module('skopos.checker')" >/dev/null 2>&1; then
+            "$PYEXEC" -m skopos.checker "$COMMAND" "$@"
             exit $?
         fi
 
-        # If we're in the repo root and `src/skopos` exists, add `src` to PYTHONPATH
-        if [ -d "$(pwd)/src/skopos" ]; then
-            PYTHONPATH=src python -m skopos.checker "$COMMAND" "$@"
+        # Try running directly from repository source
+        if [ -d "$REPOROOT/src/skopos" ]; then
+            PYTHONPATH="$REPOROOT/src" "$PYEXEC" -m skopos.checker "$COMMAND" "$@"
             exit $?
         fi
 
