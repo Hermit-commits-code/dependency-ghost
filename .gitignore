@@ -17,3 +17,20 @@ dist/
 # OS
 .DS_Store
 .skopos-whitelist
+
+# Local dev / CI artifacts
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.tox/
+build/
+pip-wheel-metadata/
+*.log
+.coverage
+coverage.xml
+htmlcov/
+.cache/
+*.sqlite3
+*.db
+.python-version
+.venv_test/
