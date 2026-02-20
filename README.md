@@ -1,7 +1,8 @@
 [![PyPI version](https://img.shields.io/pypi/v/skopos-audit.svg)](https://pypi.org/project/skopos-audit)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+![coverage](docs/coverage-badge.svg)
 
-# 🛡️ Skopos (v0.23.0)
+# 🛡️ Skopos (v0.24.0)
 
 ## Overview
 
@@ -90,11 +91,24 @@ uvx --refresh skopos
 
 If you still want to isolate the CLI into a virtual environment (recommended for development), create and activate one first and then install into it via `pip install -e .`.
 
-Reload your shell and verify the CLI is available:
+Example (recommended development workflow):
 
 ```bash
-source ~/.bashrc || source ~/.zshrc
+# create and activate a venv
+python3 -m venv .venv
+source .venv/bin/activate
+
+# install the project in editable mode
+pip install -e .
+
+# verify the CLI is available
 which skopos || skopos --version
+```
+
+If you prefer not to install, run the shim from the repository root (this sets `PYTHONPATH` to `src/`):
+
+```bash
+PYTHONPATH="$PWD/src" ./scripts/skopos-uv.sh add <package>
 ```
 
 ## Automatic Bouncer (Shim)
