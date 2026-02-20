@@ -2,7 +2,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/skopos-audit.svg)](https://pypi.org/project/skopos-audit)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-> Note: This repository received assistance from generative AI tools for refactoring, tests, and documentation. All AI-assisted changes were reviewed and approved by a human maintainer — see `AI_POLICY.md` for details.
+> Note: This repository received assistance from generative AI tools for refactoring, tests, and documentation. All AI-assisted changes were reviewed and approved by a human maintainer — see `docs/policies/AI_POLICY.md` for details.
 
 # 🛡️ Skopos (v0.25.0)
 
